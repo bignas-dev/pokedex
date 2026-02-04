@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/bignas-dev/pokedexcli/internal/pokeapi"
+	"pokedexcli/internal/pokeapi"
 )
 
 func main() {

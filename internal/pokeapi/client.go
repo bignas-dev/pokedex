@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bignas-dev/pokedexcli/internal/pokecache"
+	"pokedexcli/internal/pokecache"
 )
 
 // Client -
