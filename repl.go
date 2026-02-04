@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -6,8 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/bootdotdev/pokedexcli/internal/pokeapi"
+	"pokedexcli/internal/pokeapi"
 )
 
 type config struct {
