@@ -1,3 +1,4 @@
+// Package pokecache contains the caching logic needed
 package pokecache
 
 import (
@@ -27,7 +28,7 @@ func NewCache(interval time.Duration) *Cache {
 		for range ticker.C {
 			c.mu.Lock()
 			for key, val := range c.data {
-				if time.Now().Sub(val.createdAt) > interval {
+				if time.Since(val.createdAt) > interval {
 					delete(c.data, key)
 				}
 			}
