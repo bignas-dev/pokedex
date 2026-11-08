@@ -27,7 +27,7 @@ const (
 var offset = 0
 
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, secondval string) error {
 	url := fmt.Sprintf("%v?offset=%v&limit=%v", apiUrl, offset, limit)
 
 	bytes, ok := Cache.Get(url)
@@ -65,7 +65,7 @@ func commandMap(cfg *config) error {
 	return nil
 }
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, secondval string) error {
 	offset = max(0, offset - limit - limit)
 	url := fmt.Sprintf("%v?offset=%v&limit=%v", apiUrl, offset, limit)
 
@@ -102,4 +102,57 @@ func commandMapb(cfg *config) error {
 	}
 	offset += limit
 	return nil
+}
+
+type ExploreResponse struct {
+	PokemonEncounters []PokemonEntry `json:"pokemon_encounters"`
+}
+
+type PokemonEntry struct {
+	Entry Pokemon `json:"pokemon"`
+}
+
+
+type Pokemon struct {
+	Name string `json:"name"`
+}
+
+func commandExplore(cfg *config, secondval string) error {
+	fmt.Printf("Exploring %v...\n", secondval)
+	fmt.Println("Found Pokemon:")
+
+	url := apiUrl + secondval
+	bytes, ok := Cache.Get(url)
+	if !ok {
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return fmt.Errorf("error creating request: %w", err)
+		}
+
+		client := &http.Client{
+			Timeout: 10 * time.Second,
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			return fmt.Errorf("error getting response: %w", err)
+		}
+		defer resp.Body.Close()
+
+		bytes, err = io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("error getting response: %w", err)
+		}
+		Cache.Add(url, bytes)
+	} 
+
+	var explResp ExploreResponse
+	if err := json.Unmarshal(bytes, &explResp); err != nil {
+		return fmt.Errorf("error decoding response: %w", err)
+	}
+
+	for _, r := range explResp.PokemonEncounters {
+		fmt.Printf("- %v\n", r.Entry.Name)
+	}
+	return nil
+
 }
